@@ -112,7 +112,8 @@ namespace RottingGraphicRecolor {
                     Patch_ResolveAllGraphics.rottingColor);
                 Log.Message("[RGR] rottingGraphic set!");
             }
-            return;*/
+            return;
+            */
         }
     }
 }
