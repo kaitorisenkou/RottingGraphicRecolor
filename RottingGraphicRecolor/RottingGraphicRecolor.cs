@@ -26,7 +26,7 @@ namespace RottingGraphicRecolor {
 
     [HarmonyPatch(typeof(PawnGraphicSet), nameof(PawnGraphicSet.ResolveAllGraphics))]
     public static class Patch_ResolveAllGraphics {
-        
+
         [HarmonyTranspiler]
         static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions) {
             var instructionList = instructions.ToList();
@@ -54,7 +54,7 @@ namespace RottingGraphicRecolor {
             }
             return instructionList;
         }
-        
+
         public static Color rottingColor = new Color(0.34f, 0.32f, 0.3f);
         public static void SetRottingColor(Pawn pawn) {
             //Log.Message("[RGR] Patch_ResolveAllGraphics.SetRottingColor(" + pawn.Label + ")");
@@ -100,9 +100,9 @@ namespace RottingGraphicRecolor {
             return instructionList;
         }
         public static void SetRottingColor(Pawn pawn) {
-            //Log.Message("[RGR] Patch_ResolveGeneGraphics.SetRottingColor(" + pawn.Label + ")");
+            Log.Message("[RGR] Patch_ResolveGeneGraphics.SetRottingColor(" + pawn.Label + ")");
             Patch_ResolveAllGraphics.SetRottingColor(pawn);
-            /*
+
             var graphicSet = pawn.Drawer.renderer.graphics;
             if (graphicSet.rottingGraphic != null) {
                 graphicSet.rottingGraphic = GraphicDatabase.Get<Graphic_Multi>(
@@ -113,7 +113,38 @@ namespace RottingGraphicRecolor {
                 Log.Message("[RGR] rottingGraphic set!");
             }
             return;
-            */
+
+        }
+    }
+    [HarmonyPatch(typeof(Pawn_GeneTracker), "Notify_GenesChanged")]
+    public static class Patch_NotifyGenesChanged {
+        [HarmonyTranspiler]
+        static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions) {
+            var instructionList = instructions.ToList();
+            int stage = 0;
+            for (int i = instructionList.Count - 1; i > 0; i--) {
+                if (instructionList[i].opcode == OpCodes.Brfalse_S) {
+                    i--;
+                    var labels = instructionList[i].labels;
+                    Log.Message(labels.Count.ToString());
+                    instructionList.InsertRange(i, new CodeInstruction[] {
+                        new CodeInstruction(OpCodes.Ldarg_1),
+                        new CodeInstruction(OpCodes.Call,AccessTools.Method(typeof(Patch_NotifyGenesChanged),nameof(Patch_NotifyGenesChanged.HasRotColorOverride))),
+                        new CodeInstruction(OpCodes.Brfalse_S,labels.First()),
+                        new CodeInstruction(OpCodes.Ldc_I4_1),
+                        new CodeInstruction(OpCodes.Stloc_1)
+                    });
+                    stage++;
+                    break;
+                }
+            }
+            if (stage < 1) {
+                Log.Error("[RottingGraphicRecolor] Patch_NotifyGenesChanged failed (stage:" + stage + ")");
+            }
+            return instructionList;
+        }
+        public static bool HasRotColorOverride(GeneDef geneDef) {
+            return geneDef.HasModExtension<GeneOverrideRottingColor>();
         }
     }
 }
