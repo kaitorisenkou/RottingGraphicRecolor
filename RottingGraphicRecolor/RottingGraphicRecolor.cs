@@ -100,7 +100,7 @@ namespace RottingGraphicRecolor {
             return instructionList;
         }
         public static void SetRottingColor(Pawn pawn) {
-            Log.Message("[RGR] Patch_ResolveGeneGraphics.SetRottingColor(" + pawn.Label + ")");
+            //Log.Message("[RGR] Patch_ResolveGeneGraphics.SetRottingColor(" + pawn.Label + ")");
             Patch_ResolveAllGraphics.SetRottingColor(pawn);
 
             var graphicSet = pawn.Drawer.renderer.graphics;
@@ -110,7 +110,7 @@ namespace RottingGraphicRecolor {
                     ShaderUtility.GetSkinShader(pawn.story.SkinColorOverriden),
                     Vector2.one,
                     Patch_ResolveAllGraphics.rottingColor);
-                Log.Message("[RGR] rottingGraphic set!");
+                //Log.Message("[RGR] rottingGraphic set!");
             }
             return;
 
@@ -126,7 +126,7 @@ namespace RottingGraphicRecolor {
                 if (instructionList[i].opcode == OpCodes.Brfalse_S) {
                     i--;
                     var labels = instructionList[i].labels;
-                    Log.Message(labels.Count.ToString());
+                    //Log.Message(labels.Count.ToString());
                     instructionList.InsertRange(i, new CodeInstruction[] {
                         new CodeInstruction(OpCodes.Ldarg_1),
                         new CodeInstruction(OpCodes.Call,AccessTools.Method(typeof(Patch_NotifyGenesChanged),nameof(Patch_NotifyGenesChanged.HasRotColorOverride))),
