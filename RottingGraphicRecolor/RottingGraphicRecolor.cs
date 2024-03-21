@@ -1,4 +1,6 @@
-﻿using System;
+﻿#if !v15
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,6 +12,7 @@ using HarmonyLib;
 using System.Reflection;
 using System.Reflection.Emit;
 using UnityEngine;
+using System.Diagnostics;
 
 namespace RottingGraphicRecolor {
     [StaticConstructorOnStartup]
@@ -148,3 +151,5 @@ namespace RottingGraphicRecolor {
         }
     }
 }
+
+#endif
